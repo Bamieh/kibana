@@ -18,6 +18,8 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
+import { i18n } from '@kbn/i18n';
+
 import classNames from 'classnames';
 import { LoginState } from '../../../../../common/login_state';
 import { BasicLoginForm } from '../basic_login_form';
@@ -56,9 +58,14 @@ export class LoginPage extends Component<Props, {}> {
             </span>
             <EuiTitle size="l" className="loginWelcome__title">
               <h1>
+              {
+i18n.translate('xpack.security.loginPage.welcomeTitle', {
+  defaultMessage: 'Welcome to Kibana!',
+})
+                }<br />
                 <FormattedMessage
                   id="xpack.security.loginPage.welcomeTitle"
-                  defaultMessage="Welcome to Kibana"
+                  defaultMessage="Welcome to Kibana2"
                 />
               </h1>
             </EuiTitle>

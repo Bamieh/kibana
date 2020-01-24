@@ -20,6 +20,8 @@
 import React from 'react';
 
 import { i18nDirective, i18nFilter, I18nProvider } from '@kbn/i18n/angular';
+console.log('I18nProvider::', I18nProvider);
+window.I18nProvider = I18nProvider;
 // @ts-ignore
 import { uiModules } from 'ui/modules';
 import { npStart } from 'ui/new_platform';

@@ -65,8 +65,21 @@ export class PseudoLocaleWrapper extends React.PureComponent {
     if (isPseudoLocale(i18n.getLocale())) {
       const formatMessage = context.intl.formatMessage;
       context.intl.formatMessage = (...args: any[]) =>
-        translateFormattedMessageUsingPseudoLocale(formatMessage(...args));
+      translateFormattedMessageUsingPseudoLocale(formatMessage(...args));
+    } else {
+      const formatMessage = context.intl.formatMessage;
+      context.intl.formatMessage = (...args: any[]) => {
+        console.log('formatMessage called!', args);
+        console.log('context.intl::', context.intl);
+        console.log('i18n!@#!', i18n.getLocale())
+        const fmResult = formatMessage(...args);
+        const i18nResult = i18n.translate(args[0].id, { defaultMessage: args[0].defaultMessage });
+        console.log('fmResult::', fmResult)
+        console.log('i18nResult::', i18nResult)
+        return fmResult;
+      }
     }
+
   }
 
   public render() {

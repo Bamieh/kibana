@@ -33,10 +33,19 @@ export class I18nProvider extends React.PureComponent {
   public static propTypes = { children: PropTypes.element.isRequired };
 
   public render() {
+    console.log('i am called react!s')
+    const { messages } = i18n.getTranslation();
+    console.log('i18n.getLocale()::', i18n.getLocale());
+    console.log('messages()::', Object.keys(messages).length);
+    try {
+      throw Error('Here!2')
+    } catch(err) {
+      console.log('err::', err)
+    }
     return (
       <IntlProvider
         locale={i18n.getLocale()}
-        messages={i18n.getTranslation().messages}
+        messages={messages}
         defaultLocale={i18n.getDefaultLocale()}
         formats={i18n.getFormats()}
         textComponent={React.Fragment}

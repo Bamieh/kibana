@@ -25,6 +25,8 @@ const messageMap = {
   }),
 };
 
+import { I18nProvider } from '@kbn/i18n/react';
+
 interface AnyObject {
   [key: string]: any;
 }

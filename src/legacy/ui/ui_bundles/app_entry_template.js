@@ -34,6 +34,7 @@ const injectedMetadata = JSON.parse(document.querySelector('kbn-injected-metadat
 i18n.load(injectedMetadata.i18n.translationsUrl)
   .catch(e => e)
   .then((i18nError) => {
+    console.log('CURRENT LOCALE', i18n.getLocale());
     const coreSystem = new CoreSystem({
       injectedMetadata,
       rootDomElement: document.body,

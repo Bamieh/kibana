@@ -42,6 +42,7 @@ export class I18nService {
     };
     return {
       Context: function I18nContext({ children }) {
+        console.log('!@#context called');
         return (
           <I18nProvider>
             <EuiContext i18n={{ mapping }}>{children}</EuiContext>

@@ -16,6 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import React from 'react';
+import { FormattedMessage as Test } from 'react-intl';
+
+export const FormattedMessage = (props: any) => {
+  console.log('props::', props);
+
+  return <Test {...props} />
+}
 
 export {
   intlShape,
@@ -25,7 +33,6 @@ export {
   FormattedRelative,
   FormattedNumber,
   FormattedPlural,
-  FormattedMessage,
   FormattedHTMLMessage,
 } from 'react-intl';
 
