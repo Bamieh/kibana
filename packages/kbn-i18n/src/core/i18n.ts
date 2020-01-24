@@ -29,12 +29,27 @@ import { isPseudoLocale, translateUsingPseudoLocale } from './pseudo_locale';
 // Add all locale data to `IntlMessageFormat`.
 import './locales.js';
 
+
+try {
+  throw Error('error main!2')
+} catch(err) {
+  console.log('err::', err)
+}
+
 const EN_LOCALE = 'en';
-const translationsForLocale: Record<string, Translation> = {};
+
+if (typeof window === 'undefined'){
+  (global as any).window = {} as any;
+}
+
+(window as any).translationsForLocale = (window as any).translationsForLocale || {};
+console.log('reg locales', Object.keys((window as any).translationsForLocale))
 const getMessageFormat = memoizeIntlConstructor(IntlMessageFormat);
 
 let defaultLocale = EN_LOCALE;
-let currentLocale = EN_LOCALE;
+(window as any).currentLocale = (window as any).currentLocale || EN_LOCALE;
+console.log('(window as any).currentLocale', (window as any).currentLocale)
+
 let formats = EN_FORMATS;
 
 IntlMessageFormat.defaultLocale = defaultLocale;
@@ -63,6 +78,7 @@ function normalizeLocale(locale: string) {
  * @param [locale = messages.locale]
  */
 export function addTranslation(newTranslation: Translation, locale = newTranslation.locale) {
+  console.log('new translation!!!');
   if (!locale || !isString(locale)) {
     throw new Error('[I18n] A `locale` must be a non-empty string to add messages.');
   }
@@ -74,9 +90,9 @@ export function addTranslation(newTranslation: Translation, locale = newTranslat
   }
 
   const normalizedLocale = normalizeLocale(locale);
-  const existingTranslation = translationsForLocale[normalizedLocale] || { messages: {} };
+  const existingTranslation = (window as any).translationsForLocale[normalizedLocale] || { messages: {} };
 
-  translationsForLocale[normalizedLocale] = {
+  (window as any).translationsForLocale[normalizedLocale] = {
     formats: newTranslation.formats || existingTranslation.formats,
     locale: newTranslation.locale || existingTranslation.locale,
     messages: {
@@ -90,7 +106,7 @@ export function addTranslation(newTranslation: Translation, locale = newTranslat
  * Returns messages for the current language
  */
 export function getTranslation(): Translation {
-  return translationsForLocale[currentLocale] || { messages: {} };
+  return (window as any).translationsForLocale[(window as any).currentLocale] || { messages: {} };
 }
 
 /**
@@ -98,18 +114,18 @@ export function getTranslation(): Translation {
  * @param locale
  */
 export function setLocale(locale: string) {
+  console.log('setLocale called!!', locale);
   if (!locale || !isString(locale)) {
     throw new Error('[I18n] A `locale` must be a non-empty string.');
   }
-
-  currentLocale = normalizeLocale(locale);
+  (window as any).currentLocale = normalizeLocale(locale);
 }
 
 /**
  * Returns the current locale
  */
 export function getLocale() {
-  return currentLocale;
+  return (window as any).currentLocale;
 }
 
 /**
@@ -160,7 +176,7 @@ export function getFormats() {
  * Returns array of locales having translations
  */
 export function getRegisteredLocales() {
-  return Object.keys(translationsForLocale);
+  return Object.keys((window as any).translationsForLocale);
 }
 
 interface TranslateArguments {
@@ -177,7 +193,7 @@ interface TranslateArguments {
  * @param [options.defaultMessage] - will be used unless translation was successful
  */
 export function translate(id: string, { values = {}, defaultMessage }: TranslateArguments) {
-  const shouldUsePseudoLocale = isPseudoLocale(currentLocale);
+  const shouldUsePseudoLocale = isPseudoLocale((window as any).currentLocale);
 
   if (!id || !isString(id)) {
     throw new Error('[I18n] An `id` must be a non-empty string to translate a message.');
@@ -220,6 +236,7 @@ export function translate(id: string, { values = {}, defaultMessage }: Translate
  * @param newTranslation
  */
 export function init(newTranslation?: Translation) {
+  console.log('calling init!!!!!');
   if (!newTranslation) {
     return;
   }
