@@ -16,16 +16,3 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-export { getTelemetrySavedObject, TelemetrySavedObject } from './get_telemetry_saved_object';
-export { updateTelemetrySavedObject } from './update_telemetry_saved_object';
-
-export interface TelemetrySavedObjectAttributes {
-  enabled?: boolean | null;
-  lastVersionChecked?: string;
-  sendUsageFrom?: 'browser' | 'server';
-  lastReported?: number;
-  telemetryAllowChangingOptInStatus?: boolean;
-  userHasSeenNotice?: boolean;
-  serverReportFailing?: boolean;
-}

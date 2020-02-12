@@ -68,10 +68,18 @@ export class FetcherTask {
     };
   };
 
+  private updateReportFailing = async () => {
+    const internalRepository = this.getInternalRepository();
+    updateTelemetrySavedObject(internalRepository, {
+      serverReportFailing: true,
+    });
+  };
+
   private updateLastReported = async () => {
     const internalRepository = this.getInternalRepository();
     this.lastReported = Date.now();
     updateTelemetrySavedObject(internalRepository, {
+      serverReportFailing: false,
       lastReported: this.lastReported,
     });
   };
@@ -127,6 +135,7 @@ export class FetcherTask {
         ['warning', 'telemetry', 'fetcher'],
         `Error sending telemetry usage data: ${err}`
       );
+      await this.updateReportFailing();
     }
     this.isSending = false;
   };
