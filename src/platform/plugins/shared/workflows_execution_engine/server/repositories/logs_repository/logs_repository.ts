@@ -66,6 +66,8 @@ export class LogsRepository {
   constructor(private esClient: ElasticsearchClient, private logger: Logger) {}
 
   async createLogs(logEvents: WorkflowLogEvent[]): Promise<void> {
+    console.log('Creating logs!!!');
+
     await this.esClient?.bulk({
       refresh: 'wait_for',
       index: this.indexName,
@@ -74,6 +76,7 @@ export class LogsRepository {
   }
 
   public async initialize(): Promise<void> {
+    console.log('Initializing logs repository!!!');
     await createIndexWithMappings({
       esClient: this.esClient,
       indexName: this.indexName,

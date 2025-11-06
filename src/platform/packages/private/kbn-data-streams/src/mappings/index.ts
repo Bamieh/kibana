@@ -7,13 +7,15 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import * as mappings from './mappings';
-
-const testCases = Object.entries(mappings).sort(([a], [b]) => a.localeCompare(b));
-
-test.each(testCases)(
-  'Snapshot for %s mapping helper, do not change lightly or risk changing live mappings!',
-  (name, fn) => {
-    expect(fn()).toMatchSnapshot();
-  }
-);
+export {
+  boolean,
+  date,
+  dateNanos,
+  flattened,
+  integer,
+  keyword,
+  long,
+  object,
+  short,
+  text,
+} from './mappings';

@@ -14,6 +14,7 @@ export const PLUGIN_NAME = 'Workflows Execution Engine';
 export const WORKFLOWS_EXECUTIONS_INDEX = '.workflows-executions';
 export const WORKFLOWS_STEP_EXECUTIONS_INDEX = '.workflows-step-executions';
 export const WORKFLOWS_EXECUTION_LOGS_INDEX = '.workflows-execution-logs';
+export const WORKFLOWS_EXECUTION_LOGS_DATA_STREAM = '.workflows-execution-data-stream-logs';
 
 export const WORKFLOWS_EXECUTIONS_INDEX_MAPPINGS: MappingTypeMapping = {
   dynamic: false,

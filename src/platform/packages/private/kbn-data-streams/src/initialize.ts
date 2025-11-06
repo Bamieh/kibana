@@ -33,6 +33,12 @@ export async function initialize({
   logger = logger.get('data-streams-setup');
   logger.debug(`Setting up index template for data stream: ${dataStreams.name}`);
 
+  if (!dataStreams.name) {
+    throw new Error('Data stream name is required');
+  }
+
+  console.log('dataStreams.name::', dataStreams.name);
+  console.log('dataStreams::', dataStreams);
   let existingIndexTemplate: api.IndicesGetIndexTemplateIndexTemplateItem | undefined;
   try {
     ({
@@ -54,11 +60,12 @@ export async function initialize({
   const previousVersions: number[] = [];
   dataStreams = applyDefaults(dataStreams);
 
+  console.log('existingIndexTemplate::', existingIndexTemplate);
   if (existingIndexTemplate) {
     const deployedVersion = existingIndexTemplate.index_template?._meta?.version;
     invariant(
       typeof deployedVersion === 'number' && deployedVersion > 0,
-      `Datastream metadata is in an unexpected state, expected version to be a number but got ${deployedVersion}`
+      `Datastream ${dataStreams.name} metadata is in an unexpected state, expected version to be a number but got ${deployedVersion}`
     );
 
     if (deployedVersion >= version) {

@@ -24,6 +24,7 @@ import { ExecutionStatus } from '@kbn/workflows';
 import { WorkflowExecutionNotFoundError } from '@kbn/workflows/common/errors';
 
 import type { WorkflowsExecutionEngineConfig } from './config';
+import { getDataStreamDefinition, initializeLogsRepositoryDataStream } from './repositories/logs_repository/data_stream';
 
 import { resumeWorkflow, runWorkflow } from './execution_functions';
 import { LogsRepository } from './repositories/logs_repository/logs_repository';
@@ -42,6 +43,7 @@ import type {
   ResumeWorkflowExecutionParams,
   StartWorkflowExecutionParams,
 } from './workflow_task_manager/types';
+import { WORKFLOWS_EXECUTION_LOGS_DATA_STREAM } from '../common';
 
 type SetupDependencies = Pick<ContextDependencies, 'cloudSetup'>;
 
@@ -72,6 +74,9 @@ export class WorkflowsExecutionEnginePlugin
     const logger = this.logger;
     const config = this.config;
 
+    initializeLogsRepositoryDataStream(core.dataStreams);
+    console.log('!!! Data stream initialized !!!');
+
     const setupDependencies: SetupDependencies = { cloudSetup: plugins.cloud };
     this.setupDependencies = setupDependencies;
 
@@ -99,6 +104,7 @@ export class WorkflowsExecutionEnginePlugin
               const workflowExecutionRepository = new WorkflowExecutionRepository(esClient);
               const stepExecutionRepository = new StepExecutionRepository(esClient);
               const logsRepository = new LogsRepository(esClient, logger);
+              console.log('!!! Creating logs repository in run workflow !!!');
 
               await runWorkflow({
                 workflowRunId,
@@ -182,6 +188,14 @@ export class WorkflowsExecutionEnginePlugin
       throw new Error('Setup not called before start');
     }
     const dependencies: ContextDependencies = this.setupDependencies; // TODO: append start dependencies
+
+
+    const dataStreamClient = coreStart.dataStreams.getClient(getDataStreamDefinition());
+    dataStreamClient.index({
+      document: {
+        message: 'test 123',
+      }
+    })
 
     const executeWorkflow = async (
       workflow: WorkflowExecutionEngineModel,
