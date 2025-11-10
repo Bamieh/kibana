@@ -106,10 +106,7 @@ export const WorkflowStepExecutionDetails = React.memo<WorkflowStepExecutionDeta
                 <StepExecutionDataView stepExecution={stepExecution} mode="input" />
               )}
               {selectedTabId === 'timeline' && (
-                <StepExecutionTimelineStateful
-                  executionId={workflowExecutionId}
-                  stepExecutionId={stepExecution.id}
-                />
+                <StepExecutionTimelineStateful executionId={workflowExecutionId} />
               )}
             </EuiFlexItem>
           ) : (

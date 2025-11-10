@@ -653,7 +653,6 @@
     "contentManagement.tableList.mainColumnName": "Name",
     "contentManagement.tableList.managedItemNoEdit": "Elastic verwaltet dieses Element. Klonen Sie es, um Änderungen vorzunehmen.",
     "contentManagement.tableList.tabsFilter.allTabLabel": "Alle",
-    "contentManagement.tableList.tabsFilter.favoriteTabLabel": "Markiert",
     "contentManagement.tableList.tagBadge.buttonLabel": "{tagName} Tag-Schaltfläche.",
     "contentManagement.tableList.tagFilterPanel.clearSelectionButtonLabelLabel": "Auswahl löschen",
     "contentManagement.tableList.tagFilterPanel.doneButtonLabel": "Erledigt",

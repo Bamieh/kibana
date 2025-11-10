@@ -653,7 +653,6 @@
     "contentManagement.tableList.mainColumnName": "名前",
     "contentManagement.tableList.managedItemNoEdit": "Elasticはこの項目を管理します。変更するには、複製してください。",
     "contentManagement.tableList.tabsFilter.allTabLabel": "すべて",
-    "contentManagement.tableList.tabsFilter.favoriteTabLabel": "スター付き",
     "contentManagement.tableList.tagBadge.buttonLabel": "{tagName}タグボタン。",
     "contentManagement.tableList.tagFilterPanel.clearSelectionButtonLabelLabel": "選択した項目をクリア",
     "contentManagement.tableList.tagFilterPanel.doneButtonLabel": "完了",

@@ -653,7 +653,6 @@
     "contentManagement.tableList.mainColumnName": "名称",
     "contentManagement.tableList.managedItemNoEdit": "此项目由 Elastic 管理。请通过克隆以便进行修改",
     "contentManagement.tableList.tabsFilter.allTabLabel": "全部",
-    "contentManagement.tableList.tabsFilter.favoriteTabLabel": "带星标",
     "contentManagement.tableList.tagBadge.buttonLabel": "{tagName} 标签按钮。",
     "contentManagement.tableList.tagFilterPanel.clearSelectionButtonLabelLabel": "清除所选内容",
     "contentManagement.tableList.tagFilterPanel.doneButtonLabel": "完成",

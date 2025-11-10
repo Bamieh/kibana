@@ -10,12 +10,7 @@
 import type { TransportRequestOptionsWithOutMeta } from '@elastic/elasticsearch';
 import type api from '@elastic/elasticsearch/lib/api/types';
 
-import type {
-  Strict,
-  StrictMappingTypeMapping,
-  AnyMapping,
-  StringMapping,
-} from './mappings/types';
+import type { Strict, StrictMappingTypeMapping, AnyMapping, StringMapping } from './mappings/types';
 
 export type {
   AnyMapping,
@@ -147,6 +142,8 @@ export interface ClientHelpers<SRM extends BaseSearchRuntimeMappings> {
 
 export type IDataStreamClientIndexRequest<S extends object> = Omit<api.IndexRequest<S>, 'index'>;
 
+export type IDataStreamClientBulkRequest<S extends object> = Omit<api.BulkRequest<S>, 'bulk'>;
+
 /**
  * A client for interacting with data streams in Elasticsearch.
  *
@@ -166,11 +163,16 @@ export interface IDataStreamClient<S extends {}, SRM extends BaseSearchRuntimeMa
    */
   index: (req: IDataStreamClientIndexRequest<S>) => Promise<api.IndexResponse>;
 
+  /**
+   * The Elasticsearch JS client bulk interface.
+   */
+  bulk: (req: IDataStreamClientBulkRequest<S>) => Promise<api.BulkResponse>;
+
   helpers: ClientHelpers<SRM>;
 }
 
 // An attempt at getting TS to check mapping properties match the schema
-type ObjectToPropertiesDefinition<O extends Record<string, unknown>> = {} extends O
+type ObjectToPropertiesDefinition<O extends Record<string, unknown> = {}> = O extends {}
   ? never
   : {
       [K in keyof O]?: {} extends O[K]

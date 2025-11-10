@@ -7,10 +7,9 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import type { ElasticsearchClient, Logger } from '@kbn/core/server';
-import { WORKFLOW_EXECUTION_LOGS_INDEX_MAPPINGS } from './index_mappings';
-import { WORKFLOWS_EXECUTION_LOGS_INDEX } from '../../../common';
-import { createIndexWithMappings } from '../../../common/create_index';
+import type { DataStreamsStart } from '@kbn/core-data-streams-server';
+import type { LogsRepositoryDataStreamClient } from './data_stream';
+import { getDataStreamClient } from './data_stream';
 
 export interface WorkflowLogEvent {
   '@timestamp'?: string;
@@ -62,26 +61,68 @@ export interface LogSearchResult {
 }
 
 export class LogsRepository {
-  private indexName = WORKFLOWS_EXECUTION_LOGS_INDEX;
-  constructor(private esClient: ElasticsearchClient, private logger: Logger) {}
+  private readonly dataStreamClient: LogsRepositoryDataStreamClient;
+
+  constructor(coreDataStreams: DataStreamsStart) {
+    this.dataStreamClient = getDataStreamClient(coreDataStreams);
+  }
 
   async createLogs(logEvents: WorkflowLogEvent[]): Promise<void> {
-    console.log('Creating logs!!!');
-
-    await this.esClient?.bulk({
-      refresh: 'wait_for',
-      index: this.indexName,
-      body: logEvents.flatMap((logEvent) => [{ create: {} }, { doc: logEvent }]),
+    await this.dataStreamClient.bulk({
+      operations: logEvents.flatMap((logEvent) => [{ create: {} }, logEvent]),
     });
   }
 
-  public async initialize(): Promise<void> {
-    console.log('Initializing logs repository!!!');
-    await createIndexWithMappings({
-      esClient: this.esClient,
-      indexName: this.indexName,
-      mappings: WORKFLOW_EXECUTION_LOGS_INDEX_MAPPINGS,
-      logger: this.logger,
+  public async searchLogs(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    params: any,
+    spaceId?: string
+  ): Promise<LogSearchResult> {
+    const { limit = 100, offset = 0, sortField = '@timestamp', sortOrder = 'desc' } = params;
+
+    // Map API field names to Elasticsearch field names
+    const fieldMapping: Record<string, string> = {
+      timestamp: '@timestamp',
+      '@timestamp': '@timestamp',
+    };
+    const mappedSortField = fieldMapping[sortField] || sortField;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const mustQueries: any[] = [];
+
+    if ('executionId' in params) {
+      mustQueries.push({
+        term: { 'workflow.execution_id': params.executionId },
+      });
+    }
+
+    if ('stepExecutionId' in params && params.stepExecutionId) {
+      mustQueries.push({
+        term: { 'workflow.step_execution_id': params.stepExecutionId },
+      });
+    }
+
+    if ('stepId' in params && params.stepId) {
+      mustQueries.push({
+        term: { 'workflow.step_id': params.stepId },
+      });
+    }
+
+    if (spaceId) {
+      mustQueries.push({
+        term: { spaceId },
+      });
+    }
+
+    return this.searchDataStream({
+      size: limit,
+      from: offset,
+      query: {
+        bool: {
+          must: mustQueries,
+        },
+      },
+      sort: [{ [mappedSortField]: { order: sortOrder } }],
     });
   }
 
@@ -98,7 +139,7 @@ export class LogsRepository {
       },
     };
 
-    return this.searchLogs(query);
+    return this.searchDataStream({ query });
   }
 
   public async getLogsByLevel(level: string, executionId?: string): Promise<LogSearchResult> {
@@ -124,7 +165,7 @@ export class LogsRepository {
       },
     };
 
-    return this.searchLogs(query);
+    return this.searchDataStream({ query });
   }
 
   public async getRecentLogs(limit: number = 100): Promise<LogSearchResult> {
@@ -132,8 +173,7 @@ export class LogsRepository {
       match_all: {},
     };
 
-    const response = await this.esClient.search({
-      index: this.indexName,
+    const response = await this.dataStreamClient.search({
       query,
       sort: [{ '@timestamp': { order: 'desc' } }],
       size: limit,
@@ -167,16 +207,15 @@ export class LogsRepository {
       },
     };
 
-    return this.searchLogs(query);
+    return this.searchDataStream({ query });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async searchLogs(query: any): Promise<LogSearchResult> {
-    const response = await this.esClient.search({
-      index: this.indexName,
-      query,
+  private async searchDataStream(query: any): Promise<LogSearchResult> {
+    const response = await this.dataStreamClient.search({
       sort: [{ '@timestamp': { order: 'desc' } }],
-      size: 1000, // Default limit
+      size: 1000,
+      ...query,
     });
 
     return {

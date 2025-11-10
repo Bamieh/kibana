@@ -11,13 +11,10 @@
 
 import type { estypes } from '@elastic/elasticsearch';
 import { v4 as generateUuid } from 'uuid';
-import type {
-  ActionsClient,
-  PluginStartContract as ActionsPluginStartContract,
-  IUnsecuredActionsClient,
-} from '@kbn/actions-plugin/server';
+import type { ActionsClient, IUnsecuredActionsClient } from '@kbn/actions-plugin/server';
 import type { FindActionResult } from '@kbn/actions-plugin/server/types';
 import type {
+  CoreStart,
   ElasticsearchClient,
   KibanaRequest,
   Logger,
@@ -59,7 +56,6 @@ import type {
 } from './workflows_management_api';
 import {
   UNSUPPORTED_CONNECTOR_TYPES,
-  WORKFLOWS_EXECUTION_LOGS_INDEX,
   WORKFLOWS_EXECUTIONS_INDEX,
   WORKFLOWS_STEP_EXECUTIONS_INDEX,
 } from '../../common';
@@ -71,13 +67,14 @@ import {
   WorkflowValidationError,
 } from '../../common/lib/errors';
 import { validateStepNameUniqueness } from '../../common/lib/validate_step_names';
-import { parseWorkflowYamlToJSON, stringifyWorkflowDefinition } from '../../common/lib/yaml_utils';
+import { parseWorkflowYamlToJSON, stringifyWorkflowDefinition } from '../../common/lib/yaml';
 import { getWorkflowZodSchema, getWorkflowZodSchemaLoose } from '../../common/schema';
 import { getAuthenticatedUser } from '../lib/get_user';
 import { hasScheduledTriggers } from '../lib/schedule_utils';
 import type { WorkflowProperties, WorkflowStorage } from '../storage/workflow_storage';
 import { createStorage } from '../storage/workflow_storage';
 import type { WorkflowTaskScheduler } from '../tasks/workflow_task_scheduler';
+import type { WorkflowsServerPluginStartDeps } from '../types';
 
 const DEFAULT_PAGE_SIZE = 20;
 export interface SearchWorkflowExecutionsParams {
@@ -101,17 +98,19 @@ export class WorkflowsService {
   ) => Promise<PublicMethodsOf<ActionsClient>>;
 
   constructor(
-    esClientPromise: Promise<ElasticsearchClient>,
     logger: Logger,
     enableConsoleLogging: boolean = false,
-    getActionsStart: () => Promise<ActionsPluginStartContract>
+    getCoreStart: () => Promise<CoreStart>,
+    getPluginsStart: () => Promise<WorkflowsServerPluginStartDeps>
   ) {
     this.logger = logger;
+
     this.getActionsClient = () =>
-      getActionsStart().then((actions) => actions.getUnsecuredActionsClient());
+      getPluginsStart().then((plugins) => plugins.actions.getUnsecuredActionsClient());
     this.getActionsClientWithRequest = (request: KibanaRequest) =>
-      getActionsStart().then((actions) => actions.getActionsClientWithRequest(request));
-    void this.initialize(esClientPromise, enableConsoleLogging);
+      getPluginsStart().then((plugins) => plugins.actions.getActionsClientWithRequest(request));
+
+    void this.initialize(getCoreStart, getPluginsStart, enableConsoleLogging);
   }
 
   public setTaskScheduler(taskScheduler: WorkflowTaskScheduler) {
@@ -123,10 +122,14 @@ export class WorkflowsService {
   }
 
   private async initialize(
-    esClientPromise: Promise<ElasticsearchClient>,
+    getCoreStart: () => Promise<CoreStart>,
+    getPluginsStart: () => Promise<WorkflowsServerPluginStartDeps>,
     enableConsoleLogging: boolean = false
   ) {
-    this.esClient = await esClientPromise;
+    const coreStart = await getCoreStart();
+    const pluginsStart = await getPluginsStart();
+
+    this.esClient = coreStart.elasticsearch.client.asInternalUser;
 
     // Initialize workflow storage
     this.workflowStorage = createStorage({
@@ -136,8 +139,7 @@ export class WorkflowsService {
 
     this.workflowEventLoggerService = new SimpleWorkflowLogger(
       this.logger,
-      this.esClient,
-      WORKFLOWS_EXECUTION_LOGS_INDEX,
+      pluginsStart.workflowsExecutionEngine.logsRepository,
       enableConsoleLogging
     );
   }

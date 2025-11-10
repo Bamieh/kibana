@@ -14,20 +14,13 @@ import { FormattedMessage } from '@kbn/i18n-react';
 import { StepExecutionTimeline } from './step_execution_timeline';
 import { useWorkflowExecutionLogs } from '../../../entities/workflows/api/use_workflow_execution_logs';
 
-export const StepExecutionTimelineStateful = ({
-  executionId,
-  stepExecutionId,
-}: {
-  executionId: string;
-  stepExecutionId: string;
-}) => {
+export const StepExecutionTimelineStateful = ({ executionId }: { executionId: string }) => {
   const {
     data: logsData,
     isLoading,
     error,
   } = useWorkflowExecutionLogs({
     executionId,
-    stepExecutionId,
     limit: 100, // Get more logs without pagination
     offset: 0,
     enabled: true,

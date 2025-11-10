@@ -19,3 +19,5 @@ export {
   short,
   text,
 } from './mappings';
+
+export { createTypedMappings } from './lib';

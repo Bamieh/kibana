@@ -100,8 +100,22 @@ describe('WorkflowsService', () => {
       getUnsecuredActionsClient: mockGetActionsClient,
       getActionsClientWithRequest: mockGetActionsClientWithRequest,
     });
+    const mockDataStreamsClientPromise = Promise.resolve({
+      getClient: jest.fn().mockResolvedValue({
+        search: jest.fn().mockResolvedValue({
+          hits: { hits: [], total: { value: 0 } },
+          aggregations: {},
+        }),
+      }),
+    });
 
-    service = new WorkflowsService(mockEsClientPromise, mockLogger, false, mockGetActionsStart);
+    service = new WorkflowsService(
+      mockEsClientPromise,
+      mockDataStreamsClientPromise,
+      mockLogger,
+      false,
+      mockGetActionsStart
+    );
 
     mockSecurity = {
       authc: {

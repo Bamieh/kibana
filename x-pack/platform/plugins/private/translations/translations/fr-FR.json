@@ -651,7 +651,6 @@
     "contentManagement.tableList.mainColumnName": "Nom",
     "contentManagement.tableList.managedItemNoEdit": "Elastic gère cet objet. Clonez-le pour effectuer des modifications.",
     "contentManagement.tableList.tabsFilter.allTabLabel": "Tous",
-    "contentManagement.tableList.tabsFilter.favoriteTabLabel": "Éléments avec étoiles",
     "contentManagement.tableList.tagBadge.buttonLabel": "Bouton de balise {tagName}.",
     "contentManagement.tableList.tagFilterPanel.clearSelectionButtonLabelLabel": "Effacer la sélection",
     "contentManagement.tableList.tagFilterPanel.doneButtonLabel": "Terminé",

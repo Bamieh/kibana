@@ -958,7 +958,7 @@ paths:
 
         Refer to [Spaces](https://www.elastic.co/docs/deploy-manage/manage-spaces) for more information.
 
-        Handle A2A (Agent-to-Agent) task requests. Use this endpoint to process inter-agent communication using JSON-RPC 2.0 protocol.<br/><br/>[Required authorization] Route required privileges: read_onechat.
+        WARNING: This endpoint is designed for A2A protocol clients and should not be used directly via REST APIs. Use an A2A SDK or A2A Inspector instead.<br/><br/>[Required authorization] Route required privileges: read_onechat.
       operationId: post-agent-builder-a2a-agentid
       parameters:
         - description: The unique identifier of the agent to send the A2A task to.
@@ -972,7 +972,7 @@ paths:
           application/json:
             examples:
               a2aTaskRequestExample:
-                description: Example request for A2A Task Endpoint
+                description: 'WARNING: DO NOT USE THIS ENDPOINT VIA REST API. These examples are auto-generated and should not be run. Integrate with A2A using an A2A SDK or A2A Inspector instead.'
                 value:
                   id: task-123
                   jsonrpc: '2.0'
@@ -1674,6 +1674,24 @@ paths:
                       - type
                       - data
                   type: array
+                browser_api_tools:
+                  description: Optional browser API tools to be registered as LLM tools with browser.* namespace. These tools execute on the client side.
+                  items:
+                    additionalProperties: false
+                    type: object
+                    properties:
+                      description:
+                        description: Description of what the browser API tool does.
+                        type: string
+                      id:
+                        description: Unique identifier for the browser API tool.
+                        type: string
+                      schema: {}
+                    required:
+                      - id
+                      - description
+                      - schema
+                  type: array
                 capabilities:
                   additionalProperties: false
                   description: Controls agent capabilities during conversation. Currently supports visualization rendering for tabular tool results.
@@ -1786,6 +1804,24 @@ paths:
                       - type
                       - data
                   type: array
+                browser_api_tools:
+                  description: Optional browser API tools to be registered as LLM tools with browser.* namespace. These tools execute on the client side.
+                  items:
+                    additionalProperties: false
+                    type: object
+                    properties:
+                      description:
+                        description: Description of what the browser API tool does.
+                        type: string
+                      id:
+                        description: Unique identifier for the browser API tool.
+                        type: string
+                      schema: {}
+                    required:
+                      - id
+                      - description
+                      - schema
+                  type: array
                 capabilities:
                   additionalProperties: false
                   description: Controls agent capabilities during conversation. Currently supports visualization rendering for tabular tool results.
@@ -1862,7 +1898,7 @@ paths:
 
         Refer to [Spaces](https://www.elastic.co/docs/deploy-manage/manage-spaces) for more information.
 
-        Communicate with the MCP server via JSON-RPC 2.0. MCP is designed for AI clients like Claude Desktop, Cursor, and VS Code extensions to access your Elastic tools. Use this endpoint for testing MCP connectivity or debugging protocol communication. This endpoint requires JSON-RPC formatting and will not work from the Dev Tools Console.<br/><br/>[Required authorization] Route required privileges: read_onechat.
+        WARNING: This endpoint is designed for MCP clients (Claude Desktop, Cursor, VS Code, etc.) and should not be used directly via REST APIs. Use MCP Inspector or native MCP clients instead.<br/><br/>[Required authorization] Route required privileges: read_onechat.
       operationId: post-agent-builder-mcp
       parameters: []
       requestBody:
@@ -1870,7 +1906,7 @@ paths:
           application/json:
             examples:
               mcpInitializeRequestExample:
-                description: Example request to initalise communication over MCP protocol
+                description: 'WARNING: DO NOT USE THIS ENDPOINT VIA REST API. These examples are auto-generated and should not be run. Integrate with MCP using MCP Inspector or native MCP clients (Claude Desktop, Cursor, VS Code) instead.'
                 value:
                   id: 1
                   jsonrpc: '2.0'
@@ -59124,7 +59160,13 @@ paths:
                                                                 type: string
                                                               ignore_failure:
                                                                 type: boolean
+                                                              locale:
+                                                                minLength: 1
+                                                                type: string
                                                               output_format:
+                                                                minLength: 1
+                                                                type: string
+                                                              timezone:
                                                                 minLength: 1
                                                                 type: string
                                                               to:
@@ -61335,7 +61377,13 @@ paths:
                                                             type: string
                                                           ignore_failure:
                                                             type: boolean
+                                                          locale:
+                                                            minLength: 1
+                                                            type: string
                                                           output_format:
+                                                            minLength: 1
+                                                            type: string
+                                                          timezone:
                                                             minLength: 1
                                                             type: string
                                                           to:
@@ -63342,7 +63390,13 @@ paths:
                                                                 type: string
                                                               ignore_failure:
                                                                 type: boolean
+                                                              locale:
+                                                                minLength: 1
+                                                                type: string
                                                               output_format:
+                                                                minLength: 1
+                                                                type: string
+                                                              timezone:
                                                                 minLength: 1
                                                                 type: string
                                                               to:
@@ -65403,7 +65457,13 @@ paths:
                                                             type: string
                                                           ignore_failure:
                                                             type: boolean
+                                                          locale:
+                                                            minLength: 1
+                                                            type: string
                                                           output_format:
+                                                            minLength: 1
+                                                            type: string
+                                                          timezone:
                                                             minLength: 1
                                                             type: string
                                                           to:
@@ -67783,7 +67843,13 @@ paths:
                                                 type: string
                                               ignore_failure:
                                                 type: boolean
+                                              locale:
+                                                minLength: 1
+                                                type: string
                                               output_format:
+                                                minLength: 1
+                                                type: string
+                                              timezone:
                                                 minLength: 1
                                                 type: string
                                               to:
@@ -69767,7 +69833,13 @@ paths:
                                                 type: string
                                               ignore_failure:
                                                 type: boolean
+                                              locale:
+                                                minLength: 1
+                                                type: string
                                               output_format:
+                                                minLength: 1
+                                                type: string
+                                              timezone:
                                                 minLength: 1
                                                 type: string
                                               to:

@@ -25,10 +25,9 @@ interface StartDeps {
 /** @internal */
 export class DataStreamsService implements CoreService<DataStreamsSetup, DataStreamsStart> {
   private readonly logger: Logger;
-  private readonly dataStreams: Map<
-    DataStreamDefinition<any, any>,
-    undefined | IDataStreamClient<any, any>
-  > = new Map();
+  private readonly dataStreamDefinitions: Map<string, DataStreamDefinition<any, any>> = new Map();
+
+  private readonly dataStreamClients: Map<string, IDataStreamClient<any, any>> = new Map();
 
   constructor(private readonly coreContext: CoreContext) {
     this.logger = this.coreContext.logger.get('data-streams');
@@ -37,7 +36,11 @@ export class DataStreamsService implements CoreService<DataStreamsSetup, DataStr
   setup() {
     return {
       registerDataStream: (dataStreamDefinition: DataStreamDefinition) => {
-        this.dataStreams.set(dataStreamDefinition, undefined);
+        if (!dataStreamDefinition.name) {
+          throw new Error('Data stream name is required');
+        }
+
+        this.dataStreamDefinitions.set(dataStreamDefinition.name, dataStreamDefinition);
       },
     };
   }
@@ -46,11 +49,15 @@ export class DataStreamsService implements CoreService<DataStreamsSetup, DataStr
     const limit = pLimit(5);
     const setupPromises: Promise<void>[] = [];
 
-    for (const dataStreamDefinition of this.dataStreams.keys()) {
+    for (const [name, dataStreamDefinition] of this.dataStreamDefinitions.entries()) {
+      if (!dataStreamDefinition) {
+        throw new Error(`Data stream definition for ${name} is not registered.`);
+      }
+
       setupPromises.push(
         limit(async () => {
-          this.dataStreams.set(
-            dataStreamDefinition,
+          this.dataStreamClients.set(
+            name,
             await DataStreamClient.initialize({
               dataStreams: dataStreamDefinition,
               elasticsearchClient: elasticsearch.client.asInternalUser,
@@ -65,15 +72,16 @@ export class DataStreamsService implements CoreService<DataStreamsSetup, DataStr
 
     return {
       getClient: <S extends {}, SRM extends {}>(
-        dataStreamDefinition: DataStreamDefinition<S, SRM>
+        dataStreamName: string
       ): IDataStreamClient<S, SRM> => {
-        if (!this.dataStreams.has(dataStreamDefinition)) {
-          throw new Error(`Data stream ${dataStreamDefinition.name} is not registered.`);
+        const dataStreamDefinition = this.dataStreamDefinitions.get(dataStreamName);
+        if (!dataStreamDefinition) {
+          throw new Error(`Data stream ${dataStreamName} is not registered.`);
         }
-        const client = this.dataStreams.get(dataStreamDefinition);
+        const client = this.dataStreamClients.get(dataStreamName);
         if (!client) {
           throw new Error(
-            `Data stream client for ${dataStreamDefinition.name} is not initialized. Are you sure you are providing the same definition as in setup?`
+            `Data stream client for ${dataStreamDefinition.name} is not initialized yet.`
           );
         }
         return client;

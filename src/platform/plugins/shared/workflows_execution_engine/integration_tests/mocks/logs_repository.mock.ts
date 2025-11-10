@@ -12,14 +12,11 @@ import type {
   LogSearchResult,
   LogsRepository,
   WorkflowLogEvent,
-} from '../../server/repositories/logs_repository/logs_repository';
+} from '../../server/repositories/logs_repository';
 
 export class LogsRepositoryMock implements Required<LogsRepository> {
   public logs = new Map<string, WorkflowLogEvent>();
 
-  public initialize(): Promise<void> {
-    return Promise.resolve();
-  }
   public createLogs(logEvents: WorkflowLogEvent[]): Promise<void> {
     logEvents.forEach((event) => {
       this.logs.set(generateUuid(), event);
