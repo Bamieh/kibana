@@ -1,0 +1,17 @@
+FROM rust:bookworm AS builder
+WORKDIR /build
+RUN apt-get update && apt-get install -y --no-install-recommends pkg-config libssl-dev && rm -rf /var/lib/apt/lists/*
+COPY Cargo.toml ./
+COPY src ./src
+RUN cargo test --release
+RUN cargo build --release
+
+FROM node:24-bookworm-slim
+WORKDIR /bench
+RUN apt-get update && apt-get install -y --no-install-recommends time ca-certificates libssl3 procps && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /build/target/release/kibana-migrator-rs /usr/local/bin/kibana-migrator-rs
+COPY migrator-manifest.json /bench/migrator-manifest.json
+COPY config /bench/config
+COPY scripts /bench/scripts
+RUN chmod +x /bench/scripts/mock_kibana_fallback.sh /bench/scripts/run_benchmark.sh
+ENTRYPOINT ["/bench/scripts/run_benchmark.sh"]

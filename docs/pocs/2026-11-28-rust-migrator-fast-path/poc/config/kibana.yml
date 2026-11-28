@@ -1,0 +1,5 @@
+serverless: security
+elasticsearch.hosts: ["http://127.0.0.1:19200"]
+elasticsearch.ssl.verificationMode: none
+xpack.securitySolutionServerless.productTypes:
+  - product_tier: complete
